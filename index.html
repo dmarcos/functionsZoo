@@ -18,15 +18,110 @@
     <body>
 
         <div id="container">
-          <div id="menu"></div>
+          <div id="menu"> \(y = sin(x)\) </div>
           <div id="blackboard">
-            <canvas id="myCanvas" width="100%" height="100%" style="background: white"></canvas>
+            <canvas></canvas>
           </div>
         </div>
-
+        <script type="text/x-mathjax-config">
+          MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+        </script>
+        <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
         <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.9.1.js"><\/script>')</script>
 
         <script src="js/main.js"></script>
+        <script>
+          function fitToContainer(canvas){
+            canvas.style.width='100%';
+            canvas.style.height='100%';
+            canvas.width  = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+          }
+
+          function drawGrid(canvas, stepX, stepY, color){
+            var context = canvas.getContext('2d');
+            var i;
+            context.strokeStyle = color || 'rgb(51,51,50)';
+            for (i=0;i<canvas.width;i+=stepX) {
+              context.beginPath();
+              context.moveTo(i, 0);
+              context.lineTo(i, canvas.height);
+              context.stroke();
+            }
+            for (i=0;i<canvas.height;i+=stepY) {
+              context.beginPath();
+              context.moveTo(0, i);
+              context.lineTo(canvas.width, i);
+              context.stroke();
+            }
+
+          }
+
+          function plotFunction(f, scale, color){
+            var i;
+            var canvas = document.querySelector('canvas');
+            var context = canvas.getContext('2d');
+            var factor = scale || 1;
+            context.strokeStyle = color || 'white';
+            context.lineWidth = 1;          
+            context.beginPath();
+            context.moveTo(0, canvas.height / 2);
+            var points = [];
+            var step = 1;
+            points.push({x: 0, y: canvas.height / 2});
+            for(i=0;i<canvas.width;i+=step) { 
+              points.push({
+                x: i*step, 
+                y: ((canvas.height / 2) - (canvas.height / 2)*f((i * step / canvas.width)*2*Math.PI))
+              });
+            }
+            for(i=0;i<points.length-1;i++) {
+              var xc = (points[i].x + points[i + 1].x) / 2;
+              var yc = (points[i].y + points[i + 1].y) / 2;
+              context.quadraticCurveTo(points[i].x, points[i].y, xc, yc);
+            }
+            // for(i=0;i<canvas.width;i+=step) {
+            //   context.lineTo(i * step, canvas.height / 2 - f((i * step / canvas.height)*factor)*100);
+            //   context.moveTo(i * step, canvas.height / 2 - f((i * step / canvas.height)*factor)*100);
+            // }
+            context.stroke();
+
+          }
+
+          var wave1 = function(x) {
+            return Math.sin(x);
+          };
+
+          var wave2 = function(x) {
+            return Math.cos(x);
+          };
+
+          var wave3 = function(x) {
+            return Math.tan(x);
+          };
+
+          var line = function(x) {
+            return x;
+          }
+
+          var exp = function(x) {
+            Math.E^x;
+          };
+
+          document.addEventListener('DOMContentLoaded',function(){
+            var canvas = document.querySelector('canvas');
+            var context = canvas.getContext('2d');
+            fitToContainer(canvas);
+            context.fillStyle='rgb(26,26,26)';
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            //plotFunction(Math.sin, Math.PI*2);
+            drawGrid(canvas, canvas.width / (2) ,canvas.height / 2);
+            plotFunction(wave1, Math.PI*2, 'red');
+            plotFunction(wave2, Math.PI*2, 'blue');
+            plotFunction(wave3, Math.PI*2, 'green');
+
+          });
+        </script>
     </body>
 </html>
