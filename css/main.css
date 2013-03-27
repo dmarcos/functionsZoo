@@ -68,9 +68,10 @@ body,html{
   width: 100%;
   overflow: hidden;
   height: 100%;
+  font-size: 20pt;
 }
 
-#menu {
+#functionsMenu {
   float: left;
   width: 250px;
   height: 100%;
@@ -79,6 +80,22 @@ body,html{
   border-right: 1px solid rgb(19,19,19);
 }
 
+#functionsMenu input {
+  opacity: 0;
+}
+
+#functionsMenu input + label {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 5px;
+  margin: 0px 0px 5px 0px;
+}
+
+
+#functionsMenu input:checked + label {
+  background: rgb(53,53,53);
+}
 
 #blackboard {
   height: 100%;
@@ -89,8 +106,9 @@ body,html{
 
 
 
+#functionsList {
 
-
+}
 
 
 
