@@ -73,7 +73,7 @@ body,html{
 
 #functionsMenu {
   float: left;
-  width: 250px;
+  width: 20%;
   height: 100%;
   color: white;
   background-color: rgb(23,23,23);
@@ -103,16 +103,6 @@ body,html{
   overflow: hidden;
   background-color: rgb(26,26,26)
 }
-
-
-
-#functionsList {
-
-}
-
-
-
-
 
 /* ==========================================================================
    Media Queries
