@@ -31,8 +31,8 @@
             <label for="parabola">\(y = x^2\)</label>
             <input id="inverse" type="radio" name="function" value="inverse">
             <label for="inverse">\(y = 1/x\)</label>
-            <input id="log" type="radio" name="function" value="log">
-            <label for="log">\(y = log(x)\)</label>
+            <input id="xsin" type="radio" name="function" value="xsin">
+            <label for="xsin">\(y = x*sin(x)\)</label>
           </section>
           <div id="blackboard">
             <canvas></canvas>
@@ -96,8 +96,100 @@
                 return Math.log(x);
               },
               scale: 1
+            },
+            xsin : {
+              f : function(x) {
+                return x*Math.sin(x);
+              },
+              scale: 1
             }
 
+          };
+
+          var Plot = function(canvas, xMin, xMax, yMin, yMax) {
+            this.canvas = canvas;
+            this.xMin = xMin;
+            this.xMax = xMax;
+            this.yMin = yMin;
+            this.yMax = yMax;
+            this.curves = [];
+          };
+
+          Plot.prototype.drawCurve = function(curve){
+            var i;
+            var context = this.canvas.getContext('2d');
+            context.strokeStyle = 'red';
+            context.lineWidth = 1;          
+            context.beginPath();
+            var points = [];
+            var step = 1;
+            for (i=0;i<=this.canvas.width;i+=step) {
+              var cartesian = this.fromPixelToCartesian(i,0); 
+              points.push({
+                x: i, 
+                //y: (this.canvas.height / 2)*(1 - curve.f(cartesian.x))
+                y: this.fromCartesianToPixel(i, curve.f(cartesian.x)).y
+              });
+            }
+            for (i=0;i<points.length-1;i++) {
+              var xc = (points[i].x + points[i + 1].x) / 2;
+              var yc = (points[i].y + points[i + 1].y) / 2;
+              context.quadraticCurveTo(points[i].x, points[i].y, xc, yc);
+            }
+            // context.moveTo(points[0].x, points[0].y); 
+            // for(i=0;i<points.length;i++) {
+            //  context.lineTo(points[i].x, points[i].y);
+            //  context.moveTo(points[i].x, points[i].y);
+            // }
+            context.stroke();
+          };
+
+          Plot.prototype.draw = function() {
+            var i = 0;
+            this.drawGrid(Math.PI, 1);
+            for (i=0; i<this.curves.length; ++i) {
+              this.drawCurve(this.curves[i]);
+            }
+          };
+
+          Plot.prototype.fromPixelToCartesian = function(x, y) {
+            return {
+              x : this.xMin + (x / this.canvas.width) * (this.xMax-this.xMin),
+              y : this.yMin + (y / this.canvas.height) * (this.yMax-this.yMin)
+            }
+          };
+
+          Plot.prototype.fromCartesianToPixel = function(x, y) {
+            return {
+              x : ((x - this.xMin) / (this.xMax-this.xMin)) * this.canvas.width,
+              y : this.canvas.height*(1 - (y - this.yMin) / (this.yMax-this.yMin)) 
+            };
+          };
+
+          Plot.prototype.drawGrid = function(stepX, stepY, color) {
+            var context = this.canvas.getContext('2d');
+            var i;
+            context.strokeStyle = color || 'rgb(51,51,50)';
+            for (i=this.xMin;i<=this.xMax;i+=stepX) {
+              context.beginPath();
+              context.moveTo(
+                this.fromCartesianToPixel(i,this.yMin).x, 
+                this.fromCartesianToPixel(i,this.yMin).y);
+              context.lineTo(
+                this.fromCartesianToPixel(i,this.yMax).x, 
+                this.fromCartesianToPixel(i,this.yMax).y);
+              context.stroke();
+            }
+            for (i=this.yMin;i<this.yMax;i+=stepY) {
+              context.beginPath();
+              context.moveTo(
+                this.fromCartesianToPixel(this.xMin, i).x,
+                this.fromCartesianToPixel(this.xMin, i).y);
+              context.lineTo(
+                this.fromCartesianToPixel(this.xMax, i).x,
+                this.fromCartesianToPixel(this.xMax, i).y);
+              context.stroke();
+            }
           };
 
           var CartesianCoordinates = function(xMin, xMax, yMin, yMax) {
@@ -108,7 +200,7 @@
           };
 
           CartesianCoordinates.prototype.drawGrid = function(canvas, stepX, stepY, color){
-            var context = canvas.getContext('2d');
+            var context = document.querySelector('canvas').getContext('2d');
             var i;
             context.strokeStyle = color || 'rgb(51,51,50)';
             for (i=0;i<canvas.width;i+=stepX) {
@@ -137,8 +229,8 @@
             var step = 1;
             for (i=0;i<canvas.width;i+=step) { 
               points.push({
-                x: i*step, 
-                y: ((canvas.height / 2) - (canvas.height / 2)*f((i * step / canvas.width)*factor))
+                x: i, 
+                y: (canvas.height / 2)*(1 - f((i * step / canvas.width)*factor))
               });
             }
             for (i=0;i<points.length-1;i++) {
@@ -156,11 +248,14 @@
           };
 
           var coordinates = new CartesianCoordinates(0,0,0,0);
+          var plot;
 
           $("#functionsMenu input").click(function(input){
             var graph = functionsLibrary[input.target.value];
             resetCanvas();
-            coordinates.drawFunction(graph.f, graph.scale, 'red');
+            plot.curves = [graph];
+            plot.draw();
+            //coordinates.drawFunction(graph.f, graph.scale, 'red');
           });
 
           function resetCanvas(){
@@ -169,12 +264,14 @@
             fitToContainer(canvas);
             context.fillStyle='rgb(26,26,26)';
             context.fillRect(0, 0, canvas.width, canvas.height);
-            coordinates.drawGrid(canvas, canvas.width / 2, canvas.height / 2);
+            //coordinates.drawGrid(canvas, canvas.width / 2, canvas.height / 2);
           };
 
           document.addEventListener('DOMContentLoaded',function(){
+            plot = new Plot(document.querySelector('canvas'), -Math.PI, Math.PI, -10, 10);
             resetCanvas();
-            coordinates.drawFunction(functionsLibrary[$("#functionsMenu input:checked").first().attr('value')], Math.PI*2, 'red');
+            plot.draw();
+            //coordinates.drawFunction(functionsLibrary[$("#functionsMenu input:checked").first().attr('value')], Math.PI*2, 'red');
           });
         </script>
     </body>
