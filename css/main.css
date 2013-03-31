@@ -108,8 +108,11 @@ body,html{
    Media Queries
    ========================================================================== */
 
-@media only screen and (min-width: 35em) {
+@media screen and (max-width: 1366){
+  font-size: 10pt;
+}
 
+@media only screen and (min-width: 35em) {
 }
 
 @media print,
