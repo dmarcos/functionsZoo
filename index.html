@@ -1,275 +1,216 @@
 <!DOCTYPE html>
-<html class="no-js">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <title></title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width">
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="css/normalize.min.css">
+    <link rel="stylesheet" href="css/main.css">
+  </head>
+  <body>
+    <div id="container">
+      <section id="functionsMenu">         
+        <input id="sin" type="radio" name="function" value="sin" checked>
+        <label for="sin">\(y = a*sin(b*x + c)\)</label>
+        <input id="cos" type="radio" name="function" value="cos">
+        <label for="cos">\(y = cos(x)\)</label>
+        <input id="tan" type="radio" name="function" value="tan">
+        <label for="tan">\(y = tan(x)\)</label>
+        <input id="line" type="radio" name="function" value="line">
+        <label for="line">\(y = x\)</label>
+        <input id="parabola" type="radio" name="function" value="parabola">
+        <label for="parabola">\(y = x^2\)</label>
+        <input id="inverse" type="radio" name="function" value="inverse">
+        <label for="inverse">\(y = 1/x\)</label>
+        <input id="xsin" type="radio" name="function" value="xsin">
+        <label for="xsin">\(y = x*sin(x)\)</label>
+        <input id="ex" type="radio" name="function" value="ex">
+        <label for="ex">\(y = e^x\)</label>
+      </section>
+      <div id="blackboard">
+        <canvas></canvas>
+      </div>
+    </div>
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          extensions: ["tex2jax.js"],
+          jax: ["input/TeX","output/HTML-CSS"],
+          inlineMath: [['$','$'], ['\\(','\\)']]
+        },
+        showMathMenu: false
+      });
+    </script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
+    <script src="js/keymaster.js"></script>
+    <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.9.1.js"><\/script>')</script>
 
-        <link rel="stylesheet" href="css/normalize.min.css">
-        <link rel="stylesheet" href="css/main.css">
+    <script src="js/main.js"></script>
+    <script src="js/plot.js"></script>
+    <script src="js/function.js"></script>
+    <script>
 
-        <!--[if lt IE 9]>
-            <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-            <script>window.html5 || document.write('<script src="js/vendor/html5shiv.js"><\/script>')</script>
-        <![endif]-->
-    </head>
-    <body>
+      key('2', function(){ 
+        var func = $("label[for='sin']").get(0); 
+        var value = $("input#sin").get(0).value;
+        var selectedFunc = functionsLibrary[value];
+        selectedFunc.frequency += 1;
+        func.innerHTML = selectedFunc.toTex();
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub, func]);
+        redraw();
+      });
 
-        <div id="container">
-          <section id="functionsMenu">         
-            <input id="sin" type="radio" name="function" value="sin" checked>
-            <label for="sin">\(y = a*sin(b*x + c)\)</label>
-            <input id="cos" type="radio" name="function" value="cos">
-            <label for="cos">\(y = cos(x)\)</label>
-            <input id="tan" type="radio" name="function" value="tan">
-            <label for="tan">\(y = tan(x)\)</label>
-            <input id="line" type="radio" name="function" value="line">
-            <label for="line">\(y = x\)</label>
-            <input id="parabola" type="radio" name="function" value="parabola">
-            <label for="parabola">\(y = x^2\)</label>
-            <input id="inverse" type="radio" name="function" value="inverse">
-            <label for="inverse">\(y = 1/x\)</label>
-            <input id="xsin" type="radio" name="function" value="xsin">
-            <label for="xsin">\(y = x*sin(x)\)</label>
-            <input id="ex" type="radio" name="function" value="ex">
-            <label for="ex">\(y = e^x\)</label>
-          </section>
-          <div id="blackboard">
-            <canvas></canvas>
-          </div>
-        </div>
-        <script type="text/x-mathjax-config">
-          MathJax.Hub.Config({
-            tex2jax: {
-              extensions: ["tex2jax.js"],
-              jax: ["input/TeX","output/HTML-CSS"],
-              inlineMath: [['$','$'], ['\\(','\\)']]
-            },
-            showMathMenu: false
-          });
-        </script>
-        <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
-        <script src="js/keymaster.js"></script>
-        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.9.1.js"><\/script>')</script>
+      key('shift+2', function(){ 
+        var func = $("label[for='sin']").get(0); 
+        var value = $("input#sin").get(0).value;
+        var selectedFunc = functionsLibrary[value];
+        if (selectedFunc.frequency == 1) {
+          return;
+        }
+        selectedFunc.frequency -= 1;
+        func.innerHTML = selectedFunc.toTex();
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub, func]);
+        redraw();
+      });
 
-        <script src="js/main.js"></script>
-        <script>
+       key('1', function(){ 
+        var func = $("label[for='sin']").get(0); 
+        var value = $("input#sin").get(0).value;
+        var selectedFunc = functionsLibrary[value];
+        selectedFunc.amplitude += 1;
+        func.innerHTML = selectedFunc.toTex();
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub, func]);
+        redraw();
+      });
+       
+      key('shift+1', function(){ 
+        var func = $("label[for='sin']").get(0); 
+        var value = $("input#sin").get(0).value;
+        var selectedFunc = functionsLibrary[value];
+        if (selectedFunc.amplitude == 1) {
+          return;
+        }
+        selectedFunc.amplitude -= 1;
+        func.innerHTML = selectedFunc.toTex();
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub, func]);
+        redraw();
+      });
 
-          key('up', function(){ 
+      key('⌘+down', function(){
+        minX -= Math.PI;
+        maxX += Math.PI;
+        minY -= 1;
+        maxY += 1;
+        redraw();
+      });
+
+      key('⌘+up', function(){
+        if (maxY == 1) {
+          return;
+        }
+        minX += Math.PI;
+        maxX -= Math.PI;
+        minY += 1;
+        maxY -= 1;
+        redraw();
+      });
+
+      var blackboardDragging = false;
+      var previousX;
+      $("#blackboard")
+      .mousedown(function() {
+        $(window).mousemove(function(ev) {
+          isDragging = true;
+          if (!ev.originalEvent.shiftKey && !ev.originalEvent.altKey) {
+            return;
+          }
+          if (!previousX) {
+            previousX = ev.originalEvent.x;
+          } else {
             var func = $("label[for='sin']").get(0); 
-            func.innerHTML = "\\(y = cos (x)\\)";
+            var value = $("input#sin").get(0).value;
+            var selectedFunc = functionsLibrary[value];
+            if (ev.originalEvent.shiftKey) {
+              selectedFunc.amplitude += (ev.originalEvent.x - previousX) / 10;
+            } else {
+              selectedFunc.frequency += (ev.originalEvent.x - previousX) / 10;
+            }
+            func.innerHTML = selectedFunc.toTex();
             MathJax.Hub.Queue(["Typeset", MathJax.Hub, func]);
-          });
-          key('down', function(){ console.log("DOWN"); });
-          key('⌘+down', function(){
-            minX -= Math.PI;
-            maxX += Math.PI;
-            minY -= 1;
-            maxY += 1;
             redraw();
-          });
-
-          key('⌘+up', function(){
-            if (maxY == 1) {
-              return;
-            }
-            minX += Math.PI;
-            maxX -= Math.PI;
-            minY += 1;
-            maxY -= 1;
-            redraw();
-          });
-
-          function fitToContainer(canvas){
-            canvas.style.width = '100%';
-            canvas.style.height = '100%';
-            canvas.width = canvas.offsetWidth;
-            canvas.height = canvas.offsetHeight;
+            previousX = ev.originalEvent.x;
           }
+          console.log("DRAG");
+          //$(window).unbind("mousemove");
+        });
+      })
+      .mouseup(function() {
+        var wasDragging = isDragging;
+        isDragging = false;
+        $(window).unbind("mousemove");
+        if (!wasDragging) { //was clicking
+          $("#throbble").show();
+        }
+      });
 
-          var minX = -Math.PI;
-          var maxX = Math.PI;
-          var minY = -1;
-          var maxY =  1;
+      function fitToContainer(canvas){
+        canvas.style.width = '100%';
+        canvas.style.height = '100%';
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+      }
 
-          var functionsLibrary = {
-            cos : {
-              f : function(x) {
-                return Math.cos(x);
-              },
-              scale: Math.PI*2
-            },
-            sin : {
-              f : function(x) {
-                return Math.sin(x);
-              }
-            },
-            tan : {
-              f: function(x) {
-                return Math.tan(x);
-              }
-            },
-            line : {
-              f : function(x) {
-                return x;
-              }
-            },
-            parabola : {
-              f : function(x) {
-                return Math.pow(x,2);
-              }
-            },
-            inverse : {
-              f : function(x) {
-                return 1/x;
-              }
-            },
-            log : {
-              f : function(x) {
-                return Math.log(x);
-              }
-            },
-            xsin : {
-              f : function(x) {
-                return x*Math.sin(x);
-              }
-            },
-            ex : {
-              f : function(x) {
-                return Math.pow(Math.E,x);
-              }
-            }
+      var minX = -Math.PI;
+      var maxX = Math.PI;
+      var minY = -1;
+      var maxY =  1;
 
-          };
+      var functionsLibrary = {
+        sin : new TrigFunction(Math.sin),
+        cos : new TrigFunction(Math.cos),
+        tan : new TrigFunction(Math.tan),
+        line : new MathFunction(function(x) {return x;}),
+        parabola : new MathFunction(function(x) {
+          return Math.pow(x,2);
+        }),
+        inverse : new MathFunction(function(x) {
+          return 1/x;
+        }),
+        log : new MathFunction(Math.log),
+        xsin : new MathFunction(function(x) {
+          return x*Math.sin(x);
+        }),
+        ex : new MathFunction(function(x) {
+            return Math.pow(Math.E,x);
+        }),
+      };
 
-          var Plot = function(canvas, xMin, xMax, yMin, yMax) {
-            this.canvas = canvas;
-            this.xMin = this.xMinOriginal = xMin;
-            this.xMax = this.xMaxOriginal = xMax;
-            this.yMin = this.yMinOriginal = yMin;
-            this.yMax = this.yMaxOriginal = yMax;
-            this.curves = [];
-          };
+      var plot;
 
-          Plot.prototype.drawCurve = function(curve){
-            var i;
-            var context = this.canvas.getContext('2d');
-            context.strokeStyle = 'red';
-            context.lineWidth = 1;          
-            context.beginPath();
-            var points = [];
-            var step = 1;
-            for (i=0;i<=this.canvas.width;i+=step) {
-              var cartesian = this.fromPixelToCartesian(i,0); 
-              points.push({
-                x: i, 
-                y: this.fromCartesianToPixel(i, curve.f(cartesian.x)).y
-              });
-            }
-            for (i=0;i<points.length-1;i++) {
-              var xc = (points[i].x + points[i + 1].x) / 2;
-              var yc = (points[i].y + points[i + 1].y) / 2;
-              context.quadraticCurveTo(points[i].x, points[i].y, xc, yc);
-            }
-            // context.moveTo(points[0].x, points[0].y); 
-            // for(i=0;i<points.length;i++) {
-            //  context.lineTo(points[i].x, points[i].y);
-            //  context.moveTo(points[i].x, points[i].y);
-            // }
-            context.stroke();
-          };
+      $("#functionsMenu input").click(function(input){
+        redraw();
+      });
 
-          Plot.prototype.draw = function() {
-            var i = 0;
-            this.drawGrid(Math.PI, 1);
-            for (i=0; i<this.curves.length; ++i) {
-              this.drawCurve(this.curves[i]);
-            }
-          };
+      function resetCanvas(){
+        var canvas = document.querySelector('canvas');
+        var context = canvas.getContext('2d');
+        fitToContainer(canvas);
+        context.fillStyle='rgb(26,26,26)';
+        context.fillRect(0, 0, canvas.width, canvas.height);
+      };
 
-          Plot.prototype.fromPixelToCartesian = function(x, y) {
-            return {
-              x : this.xMin + (x / this.canvas.width) * (this.xMax-this.xMin),
-              y : this.yMin + (y / this.canvas.height) * (this.yMax-this.yMin)
-            }
-          };
+      function redraw() {
+        var graph = functionsLibrary[$("input:checked").get(0).value];
+        plot = new Plot(document.querySelector('canvas'), minX, maxX, minY, maxY);
+        plot.curves = [graph];
+        resetCanvas();
+        plot.draw();
+      }
 
-          Plot.prototype.fromCartesianToPixel = function(x, y) {
-            return {
-              x : ((x - this.xMin) / (this.xMax-this.xMin)) * this.canvas.width,
-              y : this.canvas.height*(1 - (y - this.yMin) / (this.yMax-this.yMin)) 
-            };
-          };
-
-          Plot.prototype.drawGrid = function(stepX, stepY, color) {
-            var context = this.canvas.getContext('2d');
-            var i;
-            var previousColor;
-            context.strokeStyle = color || 'rgb(51,51,50)';
-            for (i=this.xMin;i<=this.xMax;i+=stepX) {
-              context.beginPath();
-              context.moveTo(
-                this.fromCartesianToPixel(i,this.yMin).x, 
-                this.fromCartesianToPixel(i,this.yMin).y);
-              context.lineTo(
-                this.fromCartesianToPixel(i,this.yMax).x, 
-                this.fromCartesianToPixel(i,this.yMax).y);
-              if (i == 0) {
-                previousColor = context.strokeStyle;
-                context.strokeStyle = 'green';
-                context.stroke();
-                context.strokeStyle = previousColor;
-              } else {
-                context.stroke();
-              }
-            }
-            for (i=this.yMin;i<this.yMax;i+=stepY) {
-              context.beginPath();
-              context.moveTo(
-                this.fromCartesianToPixel(this.xMin, i).x,
-                this.fromCartesianToPixel(this.xMin, i).y);
-              context.lineTo(
-                this.fromCartesianToPixel(this.xMax, i).x,
-                this.fromCartesianToPixel(this.xMax, i).y);
-              if (i == 0) {
-                previousColor = context.strokeStyle;
-                context.strokeStyle = 'green';
-                context.stroke();
-                context.strokeStyle = previousColor;
-              } else {
-                context.stroke();
-              }            
-            }
-          };
-
-          var plot;
-
-          $("#functionsMenu input").click(function(input){
-            redraw();
-          });
-
-          function resetCanvas(){
-            var canvas = document.querySelector('canvas');
-            var context = canvas.getContext('2d');
-            fitToContainer(canvas);
-            context.fillStyle='rgb(26,26,26)';
-            context.fillRect(0, 0, canvas.width, canvas.height);
-          };
-
-          function redraw() {
-            var graph = functionsLibrary[$("input:checked").get(0).value];
-            plot = new Plot(document.querySelector('canvas'), minX, maxX, minY, maxY);
-            plot.curves = [graph];
-            resetCanvas();
-            plot.draw();
-          }
-
-          document.addEventListener('DOMContentLoaded',function(){
-            redraw();
-          });
-        </script>
-    </body>
+      document.addEventListener('DOMContentLoaded',function(){
+        redraw();
+      });
+    </script>
+  </body>
 </html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="css/polarCoordinates.css">
+  </head>
+  <body>
+    <div id="container">
+      <div id="cartesianCoordinates">
+        <canvas id="canvasCartesian"></canvas>
+      </div>
+      <div id="polarCoordinates">
+        <canvas id="canvasPolar"></canvas>
+      </div>
+    </div>
+    <script src="js/plot.js"></script>
+    <script src="js/function.js"></script>
+    <script>
+
+        var functions = {
+          circle : new MathFunction(function(x) {
+            return 2;
+          }),
+          spiral : new MathFunction(function(x) {
+            return .2*x;
+          }),
+          sin2 : new MathFunction(function(x) {
+            return Math.sin(2*x);
+          }),
+          cos2 : new MathFunction(function(x) {
+            return Math.cos(2*x);
+          }),
+          sin3 : new MathFunction(function(x) {
+            return Math.sin(3*x);
+          }),
+          cos3 : new MathFunction(function(x) {
+            return Math.cos(3*x);
+          }), 
+          sin : new MathFunction(function(x) {
+            return Math.sin(x);
+          }),
+          cardioidSin : new MathFunction(function(x) {
+            return 2+2*Math.sin(x);
+          }),
+          cardioidCos : new MathFunction(function(x) {
+            return 2+2*Math.cos(x);
+          }),
+          lineSin : new MathFunction(function(x) {
+            return 2/Math.sin(x);
+          }),
+          lineCos : new MathFunction(function(x) {
+            return 2/Math.cos(x);
+          }),
+          lemniscateSin : new MathFunction(function(x) {
+            return Math.sqrt(3*3*Math.cos(2*x));
+          })
+        };
+
+      function resetCanvas(){
+        var canvasCartesian = document.querySelector('#canvasCartesian');
+        var canvasPolar = document.querySelector('#canvasPolar');
+        var contextCartesian = canvasCartesian.getContext('2d');
+        var contextPolar = canvasPolar.getContext('2d');
+        canvasCartesian.style.width = canvasPolar.style.width = '100%';
+        canvasCartesian.style.height = canvasPolar.style.height = '100%';
+        canvasCartesian.width = canvasCartesian.offsetWidth;
+        canvasCartesian.height = canvasCartesian.offsetHeight;
+        canvasPolar.width = canvasPolar.offsetWidth;
+        canvasPolar.height = canvasPolar.offsetHeight;
+        contextCartesian.fillStyle='rgb(26,26,26)';
+        contextPolar.fillStyle='rgb(26,26,26)';
+        contextCartesian.fillRect(0, 0, canvasCartesian.width, canvasCartesian.height);
+        contextPolar.fillRect(0, 0, canvasPolar.width, canvasPolar.height);
+      };
+
+      function redraw() {
+        plotCartesian = new Plot(document.querySelector('#canvasCartesian'), -Math.PI*2, Math.PI*2, -2, 2);
+        plotCartesian.curves = [functions['cos2']];
+        plotPolar = new Plot(document.querySelector('#canvasPolar'), -2, 2, -2, 2);
+        plotPolar.curves = [functions['cos2']];
+        resetCanvas();
+        plotPolar.drawInPolarCoordinates();
+        plotCartesian.draw();
+      }
+      redraw();
+    </script>
+  </body>
+</html>
